@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  pdf-processor-1:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+    restart: unless-stopped
+    environment:
+      - INSTANCE_ID=1
+    depends_on:
+      - redis
+
+  pdf-processor-2:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+    restart: unless-stopped
+    environment:
+      - INSTANCE_ID=2
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
