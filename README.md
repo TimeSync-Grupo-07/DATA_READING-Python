@@ -29,7 +29,7 @@ graph TD
 - Docker Desktop instalado e rodando  
 - Git Bash instalado  
 - Conta AWS com permissões para SQS e S3  
-- Python 3.9+ (opcional para testes locais)  
+- Python 3.11+ (opcional para testes locais)  
 
 ---
 
