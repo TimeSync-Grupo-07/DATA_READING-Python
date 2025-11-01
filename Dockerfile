@@ -1,13 +1,20 @@
 FROM python:3.11-slim
 
-# Diretório de trabalho
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONIOENCODING=utf-8
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
 WORKDIR /app
 
-# Copia os arquivos
+# Copia e instala dependências
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copia todo o código
 COPY . .
 
-# Executa o main
+# Adiciona o diretório raiz ao PYTHONPATH
+ENV PYTHONPATH=/app
+
 CMD ["python", "src/main.py"]
