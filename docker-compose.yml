@@ -1,13 +1,14 @@
-version: '3.8'
-
 services:
   data_reader:
     build: .
     container_name: data_reader
-    restart: always
-    env_file:
-      - .env
     environment:
-      - PYTHONUNBUFFERED=1
-    volumes:
-      - ./logs:/app/logs
+      - IMAP_HOST=imap.gmail.com
+      - EMAIL_USER=timesync.upload@gmail.com
+      - EMAIL_PASS=iqlb pslh qmek vted
+      - S3_BUCKET=timesync-raw-teste-data-reading
+      - AWS_ACCESS_KEY_ID=timesync-raw-teste-data-reading
+      - AWS_SECRET_ACCESS_KEY=H/Lew5AttsM9eJo8+VH8iC+PpUGvUwGy1judBQXm
+      - AWS_SESSION_TOKEN=IQoJb3JpZ2luX2VjEGcaCXVzLXdlc3QtMiJGMEQCIC1gPfzcto3fv5smE0gO856t9gBuD75kxUWcyzuJP+1SAiBqcMbveK4G6y8QWXC+Hx57t3nhGsNMqc3y3EAHDPd7ayqzAggwEAAaDDU2MjY4MTIzMzE0MSIMKqYc87vHEhWHiF3GKpAC0g7UMe56yHklWcvA+nHu9ooAMo7kGLbeVwC1t5ccQW7hLJgPIuvk6a4rrtcs2NQ499Gc0a/z799+3Br7vSVhJm9hU2eVEyV5/SbS7nh8fJdYfyDSYmVcqRz3dtJFhG5USqPK1C9KP+1uTzjaedZfX5kLvemsK46Rgg/58fFzb0HHeBVdIA4J4MRPyxsh/i94wcsu1FpP5SRXklEDk433irLPvuYBePPR8T3Q9hP//DL/AQ1zFW8Ry2Zut0XutTkxet/fU9406W06oQHZBAj86GVFSBspBIDpSH5uKbCfG4DnhMuk8CAu6TjXVBna2Q9XZa9jDoVgINFPSyZY+ZqOE9zVzx1npuwgMrotd12WjOcwzLWYyAY6ngEBxuzVOiIvsZy7V6a7vAhzsj2ekKb/9UcgkC3eLHK3n4movVGyjqt9nB3wO3o5qAdCUNOk9+eDe6pBZgOACSakdgI7JBQjzI5oEjwYxbBEq0rnANoqG9AiUZwosJZiiPqMdOrR6Drw74uhAAU1qj4yrSGSuWIjs7iJWY2XBChiNgw3mkX7OGfJWvQ3MEV8b6LeoIAHoqcBHPzy1VlJaQ==
+      - AWS_DEFAULT_REGION=us-east-1
+    restart: always
