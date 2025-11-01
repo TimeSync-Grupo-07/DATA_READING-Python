@@ -1,26 +1,39 @@
+import os
 import time
-from sqs_handler import SQSConsumer
-from pdf_processor import PDFProcessor
-from s3_uploader import S3Uploader
-from config import Config
+from dotenv import load_dotenv
+from handlers.email_handler import fetch_new_pdfs
+from handlers.pdf_handler import process_pdf
+from handlers.s3_handler import upload_json_to_s3
+
+load_dotenv()
+
+IMAP_HOST = os.getenv("IMAP_HOST")
+EMAIL_USER = os.getenv("EMAIL_USER")
+EMAIL_PASS = os.getenv("EMAIL_PASS")
+S3_BUCKET = os.getenv("S3_BUCKET")
+
+CHECK_INTERVAL = 60  # segundos
 
 def main():
-    config = Config()
-    s3_uploader = S3Uploader(config)
-    pdf_processor = PDFProcessor()
-    sqs_consumer = SQSConsumer(config, pdf_processor, s3_uploader)
-
-    print("Starting PDF processing service...")
+    print("📬 Iniciando listener de e-mails...")
     while True:
         try:
-            sqs_consumer.process_messages()
-            time.sleep(10)  # Sleep for 10 seconds between polling
-        except KeyboardInterrupt:
-            print("\nShutting down...")
-            break
+            pdfs = fetch_new_pdfs(IMAP_HOST, EMAIL_USER, EMAIL_PASS)
+
+            if not pdfs:
+                print("Nenhum novo e-mail encontrado.")
+            else:
+                for pdf in pdfs:
+                    print(f"📄 Processando {pdf['filename']}...")
+                    json_data = process_pdf(pdf["content"])
+                    json_key = pdf["filename"].replace(".pdf", ".json")
+                    upload_json_to_s3(json_data, S3_BUCKET, json_key)
+
         except Exception as e:
-            print(f"Error occurred: {str(e)}")
-            time.sleep(30)  # Wait before retrying after an error
+            print(f"❌ Erro no ciclo principal: {e}")
+
+        print(f"⏳ Aguardando {CHECK_INTERVAL}s para nova verificação...")
+        time.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":
     main()
