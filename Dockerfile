@@ -1,9 +1,13 @@
-FROM python:3.11
+FROM python:3.11-slim
 
+# Diretório de trabalho
 WORKDIR /app
 
-COPY . /app
+# Copia os arquivos
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --trusted-host pypi.python.org -r requirements.txt
+COPY . .
 
-CMD ["python", "./src/main.py"]
+# Executa o main
+CMD ["python", "src/main.py"]
