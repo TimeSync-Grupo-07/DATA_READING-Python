@@ -2,9 +2,5 @@ services:
   data_reader:
     build: .
     container_name: data_reader
-    environment:
-      - IMAP_HOST=imap.gmail.com
-      - EMAIL_USER=timesync.upload@gmail.com
-      - EMAIL_PASS=iqlbpslhqmekvted
-      - S3_BUCKET=testet-permissao-user
+    env_file: .env
     restart: always
