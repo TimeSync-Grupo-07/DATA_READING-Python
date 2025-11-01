@@ -7,6 +7,9 @@ from botocore.exceptions import ClientError  # 👈 ADICIONE ESTE IMPORT
 from src.handlers.email_handler import fetch_new_pdfs
 from src.utils.pdf_to_json import pdf_to_json
 import traceback
+import re
+import unicodedata
+from datetime import datetime
 
 def log(msg):
     """Imprime mensagens com timestamp"""
