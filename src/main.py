@@ -98,8 +98,12 @@ def main_loop():
                     data = pdf_to_json(pdf["content"])
                     log(f"📄 PDF convertido: {len(data.get('lines', []))} linhas extraídas")
                     
-                    # Define chave S3
-                    s3_key = pdf['filename'].replace('.pdf', '.json')
+                    # EXTRAI O NOME DO COLABORADOR PARA O NOME DO ARQUIVO
+                    employee_name = extract_employee_name_for_filename(data)
+                    current_date = time.strftime("%Y-%m-%d")
+                    
+                    # Define chave S3 com o novo padrão: Nome_Colaborador_Data_envio_email.json
+                    s3_key = f"{employee_name}_{current_date}.json"
                     log(f"📤 Tentando upload para S3: {s3_key}")
                     
                     # Faz upload
@@ -110,10 +114,49 @@ def main_loop():
 
         except Exception as e:
             log(f"❌ Erro no ciclo principal: {e}")
+            import traceback
             log(f"🔍 Traceback: {traceback.format_exc()}")
 
         log("⏳ Aguardando 60s para nova verificação...\n")
         time.sleep(60)
+
+def extract_employee_name_for_filename(data):
+    """
+    Extrai e formata o nome do colaborador para usar no nome do arquivo.
+    Remove acentos, espaços e caracteres especiais.
+    """
+    try:
+        # Tenta pegar o nome da estrutura processada
+        employee_name = data.get('header_info', {}).get('employee', {}).get('name', '')
+        
+        if not employee_name:
+            # Fallback: procura nas linhas brutas
+            for line in data.get('raw_lines', []):
+                if 'Colaborador(a):' in line:
+                    # Exemplo: "Colaborador(a): Giovanna AAvila (Matrícula: 509880)"
+                    match = re.search(r'Colaborador\(a\):\s*([^(]+)', line)
+                    if match:
+                        employee_name = match.group(1).strip()
+                        break
+        
+        # Limpa e formata o nome para o arquivo
+        if employee_name:
+            # Remove acentos e caracteres especiais
+            import unicodedata
+            employee_name = unicodedata.normalize('NFKD', employee_name)
+            employee_name = ''.join(c for c in employee_name if not unicodedata.combining(c))
+            
+            # Substitui espaços por underscores e remove outros caracteres especiais
+            employee_name = re.sub(r'[^\w\s-]', '', employee_name)
+            employee_name = re.sub(r'[-\s]+', '_', employee_name)
+            
+            return employee_name.lower()
+        else:
+            return "colaborador_desconhecido"
+            
+    except Exception as e:
+        log(f"⚠️ Erro ao extrair nome do colaborador: {e}")
+        return "colaborador_desconhecido"
 
 if __name__ == "__main__":
     main_loop()
