@@ -1,0 +1,6 @@
+services:
+  data_reader:
+    build: .
+    container_name: data_reader
+    env_file: .env
+    restart: always
